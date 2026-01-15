@@ -1,3 +1,7 @@
+# Railway configuration for KSP
+# This file is for the API service
+# Web service should be added separately in Railway dashboard
+
 [build]
 builder = "nixpacks"
 buildCmd = "npm run build:api"
