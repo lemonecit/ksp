@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { prisma } from '@ksp/database'
 import { notFound } from 'next/navigation'
 import ProductJsonLd from '@/components/ProductJsonLd'
 import PriceHistoryChart from '@/components/PriceHistoryChart'
@@ -8,27 +7,22 @@ interface Props {
   params: { locale: string; slug: string }
 }
 
-// Generate static params for all products
+// Generate static params for all products (fetch from API route)
 export async function generateStaticParams() {
-  const contents = await prisma.content.findMany({
-    select: { slug: true, lang: true }
-  })
-  
-  return contents.map((c) => ({
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/product/all`)
+  if (!res.ok) return []
+  const contents = await res.json()
+  return contents.map((c: any) => ({
     locale: c.lang,
     slug: c.slug
   }))
 }
 
-// Dynamic metadata for SEO
+// Dynamic metadata for SEO (fetch from API route)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const content = await prisma.content.findFirst({
-    where: { slug: params.slug, lang: params.locale as any },
-    include: { product: true }
-  })
-  
-  if (!content) return { title: 'Product Not Found' }
-  
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/product?locale=${params.locale}&slug=${params.slug}`)
+  if (!res.ok) return { title: 'Product Not Found' }
+  const content = await res.json()
   return {
     title: `${content.title} | SmartBuy`,
     description: content.description.substring(0, 160),
@@ -44,16 +38,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { locale, slug } = params
   const isHebrew = locale === 'he'
-  
-  const content = await prisma.content.findFirst({
-    where: { slug, lang: locale as any },
-    include: { product: true }
-  })
-  
-  if (!content) notFound()
-  
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/product?locale=${locale}&slug=${slug}`)
+  if (!res.ok) notFound()
+  const content = await res.json()
   const { product } = content
-  
   return (
     <>
       {/* JSON-LD Schema for Google Rich Results */}
@@ -66,7 +54,6 @@ export default async function ProductPage({ params }: Props) {
         url={`https://smartbuy.co.il/${locale}/${slug}`}
         image={product.imageUrl || ''}
       />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Product Image */}
@@ -79,11 +66,9 @@ export default async function ProductPage({ params }: Props) {
               />
             )}
           </div>
-          
           {/* Product Info */}
           <div>
             <h1 className="text-3xl font-bold mb-4">{content.title}</h1>
-            
             <div className="flex items-center gap-4 mb-6">
               <span className="text-4xl font-bold text-blue-600">
                 ₪{product.priceCurrent.toString()}
@@ -99,7 +84,6 @@ export default async function ProductPage({ params }: Props) {
                 }
               </span>
             </div>
-            
             {/* Affiliate CTA Button */}
             <a 
               href={`/go/${product.id}?channel=site&lang=${locale}`}
@@ -107,7 +91,6 @@ export default async function ProductPage({ params }: Props) {
             >
               {isHebrew ? '🛒 קנה עכשיו ב-KSP' : '🛒 Buy Now at KSP'}
             </a>
-            
             {/* Description */}
             <div className="prose max-w-none">
               <h2>{isHebrew ? 'תיאור' : 'Description'}</h2>
@@ -117,7 +100,6 @@ export default async function ProductPage({ params }: Props) {
             </div>
           </div>
         </div>
-        
         {/* Price History Chart */}
         <section className="mt-12 bg-white rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-4">

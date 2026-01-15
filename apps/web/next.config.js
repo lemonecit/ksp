@@ -22,7 +22,7 @@ const nextConfig = {
     const path = require('path');
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@ksp/database': path.resolve(__dirname, '../../packages/database'),
+      '@ksp/database': path.resolve(__dirname, '../../packages/database/dist'),
       '@ksp/shared': path.resolve(__dirname, '../../packages/shared'),
     };
     return config;
