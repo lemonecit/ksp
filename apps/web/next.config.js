@@ -19,10 +19,11 @@ const nextConfig = {
   
   // Webpack configuration for monorepo support
   webpack: (config, { isServer }) => {
+    const path = require('path');
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@ksp/database': require.resolve('../../packages/database/src'),
-      '@ksp/shared': require.resolve('../../packages/shared/src'),
+      '@ksp/database': path.resolve(__dirname, '../../packages/database'),
+      '@ksp/shared': path.resolve(__dirname, '../../packages/shared'),
     };
     return config;
   },
