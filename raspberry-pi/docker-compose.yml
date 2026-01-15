@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ksp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ksp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ksp_affiliate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ksp -d ksp_affiliate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cloudflare Tunnel - exposes PostgreSQL securely to Railway/Vercel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ksp-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ksp-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  # Scraper - runs on schedule
+  scraper:
+    build:
+      context: ..
+      dockerfile: raspberry-pi/Dockerfile.scraper
+    container_name: ksp-scraper
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ksp:${POSTGRES_PASSWORD:-changeme}@postgres:5432/ksp_affiliate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Run scraper every 6 hours
+    labels:
+      - "ofelia.enabled=true"
+      - "ofelia.job-exec.scraper.schedule=0 0 */6 * * *"
+      - "ofelia.job-exec.scraper.command=npm run scrape"
+
+  # Ofelia - cron scheduler for Docker
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: ksp-scheduler
+    restart: unless-stopped
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - scraper
+
+volumes:
+  postgres_data:
+  pgadmin_data:

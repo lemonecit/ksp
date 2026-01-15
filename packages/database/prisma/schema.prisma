@@ -1,11 +1,14 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  // SQLite for local dev, PostgreSQL for production (Raspberry Pi)
+  // Turso (libsql) for production, SQLite for local
+  // TURSO_DATABASE_URL="libsql://xxx.turso.io"
+  // TURSO_AUTH_TOKEN="xxx"
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================
