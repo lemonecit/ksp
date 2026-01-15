@@ -1,2 +1,2 @@
-web: node --import tsx src/index.ts
+web: npm start
 worker: node --import tsx src/workers/scraper-cron.ts
