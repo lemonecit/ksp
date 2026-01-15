@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ksp-blue: #0066cc;
+  --ksp-orange: #ff6600;
+}
+
+/* RTL support for Hebrew */
+[dir="rtl"] {
+  text-align: right;
+}
+
+.product-card {
+  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200;
+}
+
+.btn-primary {
+  @apply bg-[--ksp-blue] text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors;
+}
+
+.btn-affiliate {
+  @apply bg-[--ksp-orange] text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition-colors;
+}

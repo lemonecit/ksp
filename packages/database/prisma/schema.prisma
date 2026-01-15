@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // SQLite for local dev, PostgreSQL for production (Raspberry Pi)
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ============================================
+// PRODUCTS - Scraped from KSP
+// ============================================
+model Product {
+  id            String   @id @default(uuid())
+  sku           String   @unique // KSP's unique product ID
+  priceCurrent  Float
+  priceHistory  String   @default("[]") // Array of {price, date} as JSON string
+  category      String
+  imageUrl      String?
+  inStock       Boolean  @default(true)
+  kspUrl        String   // Original KSP URL
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  content       Content[]
+  clicks        RevenueTracking[]
+  priceAlerts   PriceAlert[]
+  
+  @@index([category])
+  @@index([sku])
+}
+
+// ============================================
+// CONTENT - Bilingual (Hebrew & English)
+// ============================================
+// Language: 'he' | 'en'
+
+model Content {
+  id          String   @id @default(uuid())
+  productId   String
+  lang        String   // 'he' or 'en'
+  title       String
+  description String
+  slug        String   // SEO-friendly URL
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([productId, lang])
+  @@index([slug])
+  @@index([lang])
+}
+
+// ============================================
+// REVENUE TRACKING - Affiliate clicks & sales
+// ============================================
+// Platform: 'telegram' | 'site' | 'whatsapp' | 'instagram' | 'facebook'
+// Status: 'pending' | 'confirmed' | 'rejected'
+
+model RevenueTracking {
+  id          String   @id @default(uuid()) // This becomes the UIN for KSP
+  productId   String
+  platform    String   // telegram, site, whatsapp, instagram, facebook
+  language    String   // he, en
+  commission  Float?
+  status      String   @default("pending") // pending, confirmed, rejected
+  
+  clickedAt   DateTime @default(now())
+  confirmedAt DateTime?
+  
+  // Relations
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  @@index([platform])
+  @@index([status])
+  @@index([clickedAt])
+}
+
+// ============================================
+// KSP REPORT IMPORTS
+// ============================================
+model ReportImport {
+  id            String   @id @default(uuid())
+  filename      String
+  totalRows     Int
+  matchedRows   Int
+  totalRevenue  Float
+  importedAt    DateTime @default(now())
+}
+
+// ============================================
+// PRICE ALERTS - Triggered when prices change
+// ============================================
+// Type: 'price_drop' | 'price_increase' | 'back_in_stock' | 'low_stock'
+// Status: 'pending' | 'sent' | 'dismissed'
+
+model PriceAlert {
+  id            String   @id @default(uuid())
+  productId     String
+  type          String   // price_drop, price_increase, back_in_stock
+  oldPrice      Float?
+  newPrice      Float?
+  percentChange Float?   // Negative for drops, positive for increases
+  status        String   @default("pending") // pending, sent, dismissed
+  notified      Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  sentAt        DateTime?
+  
+  // Relations
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// TELEGRAM POST LOG - Track all Telegram posts
+// ============================================
+model TelegramPost {
+  id            String   @id @default(uuid())
+  productId     String?
+  alertId       String?
+  
+  // Post content
+  title         String
+  oldPrice      Float?
+  newPrice      Float
+  percentOff    Float?
+  imageUrl      String?
+  affiliateLink String
+  
+  // Status
+  status        String   @default("sent") // sent, failed, scheduled
+  messageId     String?  // Telegram message ID
+  error         String?  // Error message if failed
+  
+  // Scheduling
+  scheduledFor  DateTime?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// TELEGRAM SETTINGS - Bot configuration
+// ============================================
+model TelegramSettings {
+  id              String   @id @default("default")
+  
+  // Bot config
+  botToken        String   @default("")
+  channelId       String   @default("")
+  
+  // Posting schedule (times in 24h format)
+  scheduleEnabled Boolean  @default(true)
+  scheduleTimes   String   @default("[\"10:00\", \"20:00\"]") // JSON array
+  
+  // Filters
+  minDiscountPercent Float @default(40) // Minimum discount to post
+  maxPostsPerDay    Int    @default(10)
+  
+  // Counts
+  postsToday        Int    @default(0)
+  lastPostAt        DateTime?
+  lastResetAt       DateTime @default(now())
+  
+  updatedAt         DateTime @updatedAt
+}
+

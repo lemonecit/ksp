@@ -1,0 +1,32 @@
+{
+  "home": {
+    "title": "SmartBuy - Smart Price Comparison",
+    "subtitle": "Find the best prices at KSP",
+    "cta": "Discover Deals"
+  },
+  "product": {
+    "price": "Price",
+    "buyNow": "Buy Now at KSP",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "priceHistory": "Price History",
+    "specifications": "Specifications",
+    "description": "Description"
+  },
+  "categories": {
+    "laptops": "Laptops",
+    "phones": "Phones",
+    "gaming": "Gaming",
+    "kitchen": "Kitchen",
+    "tv": "Televisions"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "deals": "Deals",
+    "about": "About"
+  },
+  "footer": {
+    "disclaimer": "This site uses affiliate links. We may earn a commission from purchases."
+  }
+}

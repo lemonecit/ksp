@@ -1,0 +1,21 @@
+{
+  "name": "@ksp/scraper",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "scrape": "tsx src/scraper.ts",
+    "translate": "tsx src/translator.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@ksp/database": "file:../../packages/database",
+    "playwright": "^1.40.0",
+    "openai": "^4.20.0",
+    "p-queue": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0"
+  }
+}

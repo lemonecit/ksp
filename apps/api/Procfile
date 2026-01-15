@@ -1,0 +1,2 @@
+web: node --import tsx src/index.ts
+worker: node --import tsx src/workers/scraper-cron.ts

@@ -1,0 +1,32 @@
+{
+  "home": {
+    "title": "SmartBuy - השוואת מחירים חכמה",
+    "subtitle": "מצא את המחירים הטובים ביותר ב-KSP",
+    "cta": "גלה מבצעים"
+  },
+  "product": {
+    "price": "מחיר",
+    "buyNow": "קנה עכשיו ב-KSP",
+    "inStock": "במלאי",
+    "outOfStock": "אזל מהמלאי",
+    "priceHistory": "היסטוריית מחירים",
+    "specifications": "מפרט טכני",
+    "description": "תיאור"
+  },
+  "categories": {
+    "laptops": "מחשבים ניידים",
+    "phones": "טלפונים",
+    "gaming": "גיימינג",
+    "kitchen": "מטבח",
+    "tv": "טלוויזיות"
+  },
+  "nav": {
+    "home": "דף הבית",
+    "categories": "קטגוריות",
+    "deals": "מבצעים",
+    "about": "אודות"
+  },
+  "footer": {
+    "disclaimer": "האתר משתמש בקישורי שותפים. אנו עשויים לקבל עמלה מרכישות."
+  }
+}
