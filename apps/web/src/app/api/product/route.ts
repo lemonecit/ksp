@@ -1,6 +1,9 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@ksp/database'
 
+// Mark as dynamic to skip prerendering during build
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const locale = searchParams.get('locale')

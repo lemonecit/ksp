@@ -7,16 +7,8 @@ interface Props {
   params: { locale: string; slug: string }
 }
 
-// Generate static params for all products (fetch from API route)
-export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/product/all`)
-  if (!res.ok) return []
-  const contents = await res.json()
-  return contents.map((c: any) => ({
-    locale: c.lang,
-    slug: c.slug
-  }))
-}
+// Skip static generation - use dynamic rendering only
+export const dynamic = 'force-dynamic'
 
 // Dynamic metadata for SEO (fetch from API route)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
