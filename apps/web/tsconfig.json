@@ -16,6 +16,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@ksp/database": ["../../packages/database/src"],
+      "@ksp/shared": ["../../packages/shared/src"]
+    },
     "plugins": [
       {
         "name": "next"
