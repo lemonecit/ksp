@@ -4,3 +4,4 @@ buildCmd = "npm run build:api"
 
 [deploy]
 startCmd = "npm run start:api"
+restartPolicyType = "ON_FAILURE"
