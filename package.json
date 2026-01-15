@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "KSP Affiliate Revenue System with bilingual support",
   "private": true,
+  "packageManager": "npm@10.2.0",
   "scripts": {
     "dev:api": "cd apps/api && npm run dev",
     "dev:web": "cd apps/web && npm run dev",
@@ -12,7 +13,9 @@
     "db:migrate": "cd packages/database && npx prisma migrate dev",
     "db:generate": "cd packages/database && npx prisma generate",
     "db:studio": "cd packages/database && npx prisma studio",
-    "install:all": "npm install && cd packages/database && npm install && cd ../../apps/api && npm install && cd ../web && npm install && cd ../admin && npm install && cd ../scraper && npm install"
+    "install:all": "npm install && cd packages/database && npm install && cd ../../apps/api && npm install && cd ../web && npm install && cd ../admin && npm install && cd ../scraper && npm install",
+    "build:api": "cd packages/database && npm install && npx prisma generate && cd ../../apps/api && npm install && npm run build",
+    "start:api": "cd apps/api && npm start"
   },
   "devDependencies": {
     "typescript": "^5.3.0"
