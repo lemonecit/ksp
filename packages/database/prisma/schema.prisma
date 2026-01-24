@@ -177,3 +177,13 @@ model TelegramSettings {
   updatedAt         DateTime @updatedAt
 }
 
+model AdminUser {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String?
+  totpEnabled Boolean  @default(false)
+  totpSecret  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

@@ -16,6 +16,7 @@ import { ScraperControl } from "./pages/scraper"
 import { ContentList } from "./pages/content"
 import { TelegramPage } from "./pages/telegram"
 import { LoginPage } from "./pages/login"
+import { SecurityPage } from "./pages/security"
 
 const API_URL = import.meta.env.VITE_API_URL || "/api"
 
@@ -83,6 +84,11 @@ function App() {
                 name: "telegram",
                 list: "/telegram",
                 meta: { label: "📱 Telegram" },
+              },
+              {
+                name: "security",
+                list: "/security",
+                meta: { label: "🔐 Security" },
               },            ]}
             options={{
               syncWithLocation: true,
@@ -109,6 +115,7 @@ function App() {
                   <Route path="/alerts" element={<AlertList />} />
                   <Route path="/scraper" element={<ScraperControl />} />
                   <Route path="/telegram" element={<TelegramPage />} />
+                  <Route path="/security" element={<SecurityPage />} />
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
               </Route>

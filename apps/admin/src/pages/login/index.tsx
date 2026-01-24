@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Card, Typography, Alert } from "antd"
+import { Card, Typography, Alert, Input, Button, Space } from "antd"
 import axios from "axios"
 
 const { Title, Paragraph } = Typography
@@ -15,6 +15,9 @@ declare global {
 
 export const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
+  const [pre2faToken, setPre2faToken] = useState<string | null>(null)
+  const [twofaCode, setTwofaCode] = useState("")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token")
@@ -38,13 +41,22 @@ export const LoginPage = () => {
         client_id: GOOGLE_CLIENT_ID,
         callback: async (resp: any) => {
           try {
+            setLoading(true)
             setError(null)
             const credential = resp?.credential
             const res = await axios.post(`${API_URL}/auth/google`, { credential })
+
+            if (res.data?.requires2fa) {
+              setPre2faToken(res.data.pre2faToken)
+              return
+            }
+
             localStorage.setItem("admin_token", res.data.token)
             window.location.href = "/"
           } catch (e: any) {
             setError(e?.response?.data?.error || e.message || "Login failed")
+          } finally {
+            setLoading(false)
           }
         },
       })
@@ -59,6 +71,24 @@ export const LoginPage = () => {
     init()
   }, [])
 
+  const verify2fa = async () => {
+    if (!pre2faToken) return
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await axios.post(`${API_URL}/auth/2fa/login`, {
+        pre2faToken,
+        code: twofaCode,
+      })
+      localStorage.setItem("admin_token", res.data.token)
+      window.location.href = "/"
+    } catch (e: any) {
+      setError(e?.response?.data?.error || e.message || "2FA failed")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <Card style={{ width: 420 }}>
@@ -69,7 +99,26 @@ export const LoginPage = () => {
 
         {error && <Alert type="error" message={error} style={{ marginBottom: 16 }} />}
 
-        <div id="g_id_signin" />
+        {pre2faToken ? (
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Alert
+              type="info"
+              message="2FA required"
+              description="Enter the 6-digit code from Google Authenticator."
+            />
+            <Input
+              value={twofaCode}
+              onChange={(e) => setTwofaCode(e.target.value)}
+              placeholder="123456"
+              maxLength={6}
+            />
+            <Button type="primary" onClick={verify2fa} loading={loading} disabled={!twofaCode}>
+              Verify
+            </Button>
+          </Space>
+        ) : (
+          <div id="g_id_signin" />
+        )}
       </Card>
     </div>
   )
