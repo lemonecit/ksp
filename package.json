@@ -15,12 +15,12 @@
     "db:generate": "cd packages/database && npx prisma generate",
     "db:studio": "cd packages/database && npx prisma studio",
     "install:all": "npm install && cd packages/database && npm install && cd ../../apps/api && npm install && cd ../web && npm install && cd ../admin && npm install && cd ../scraper && npm install",
-    "build:api": "cd packages/database && npm install && npx prisma generate && cd ../../apps/api && npm install && npm run build",
+    "build:api": "cd packages/database && npm install && npx prisma generate && npm run build && cd ../../apps/api && npm install && npm run build",
     "build:admin": "cd apps/admin && npm install && npm run build",
     "build:railway": "npm run build:admin && npm run build:api",
     "start:api": "cd apps/api && npm start",
     "start:railway": "npm run start:api",
-    "build:web": "cd packages/database && npm install && npx prisma generate && cd ../../apps/web && npm install && npm run build",
+    "build:web": "cd packages/database && npm install && npx prisma generate && npm run build && cd ../../apps/web && npm install && npm run build",
     "start:web": "cd apps/web && npm start"
   },
   "devDependencies": {
