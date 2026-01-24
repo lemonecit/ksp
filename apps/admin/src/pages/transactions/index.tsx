@@ -3,7 +3,7 @@ import { Table, Tag, Card, Select, Space, Typography } from "antd"
 import axios from "axios"
 
 const { Title } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
+const API_URL = import.meta.env.VITE_API_URL || "/api"
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "orange",

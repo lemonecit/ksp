@@ -2,9 +2,10 @@ import { Refine } from "@refinedev/core"
 import { ThemedLayoutV2, useNotificationProvider, ErrorComponent } from "@refinedev/antd"
 import routerBindings, { UnsavedChangesNotifier } from "@refinedev/react-router-v6"
 import dataProvider from "@refinedev/simple-rest"
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom"
 import { ConfigProvider, App as AntdApp } from "antd"
 import "@refinedev/antd/dist/reset.css"
+import axios from "axios"
 
 import { DashboardPage } from "./pages/dashboard"
 import { ProductList } from "./pages/products"
@@ -14,8 +15,25 @@ import { AlertList } from "./pages/alerts"
 import { ScraperControl } from "./pages/scraper"
 import { ContentList } from "./pages/content"
 import { TelegramPage } from "./pages/telegram"
+import { LoginPage } from "./pages/login"
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
+const API_URL = import.meta.env.VITE_API_URL || "/api"
+
+const token = () => localStorage.getItem('admin_token')
+
+const RequireAuth = () => {
+  if (!token()) return <Navigate to="/login" replace />
+  return <Outlet />
+}
+
+axios.interceptors.request.use((config) => {
+  const t = token()
+  if (t) {
+    config.headers = config.headers || {}
+    config.headers.Authorization = `Bearer ${t}`
+  }
+  return config
+})
 
 function App() {
   return (
@@ -72,22 +90,27 @@ function App() {
             }}
           >
             <Routes>
+              <Route path="/login" element={<LoginPage />} />
               <Route
-                element={
-                  <ThemedLayoutV2>
-                    <Outlet />
-                  </ThemedLayoutV2>
-                }
+                element={<RequireAuth />}
               >
-                <Route index element={<DashboardPage />} />
-                <Route path="/products" element={<ProductList />} />
-                <Route path="/content" element={<ContentList />} />
-                <Route path="/transactions" element={<TransactionList />} />
-                <Route path="/reports" element={<ReportImport />} />
-                <Route path="/alerts" element={<AlertList />} />
-                <Route path="/scraper" element={<ScraperControl />} />
-                <Route path="/telegram" element={<TelegramPage />} />
-                <Route path="*" element={<ErrorComponent />} />
+                <Route
+                  element={
+                    <ThemedLayoutV2>
+                      <Outlet />
+                    </ThemedLayoutV2>
+                  }
+                >
+                  <Route index element={<DashboardPage />} />
+                  <Route path="/products" element={<ProductList />} />
+                  <Route path="/content" element={<ContentList />} />
+                  <Route path="/transactions" element={<TransactionList />} />
+                  <Route path="/reports" element={<ReportImport />} />
+                  <Route path="/alerts" element={<AlertList />} />
+                  <Route path="/scraper" element={<ScraperControl />} />
+                  <Route path="/telegram" element={<TelegramPage />} />
+                  <Route path="*" element={<ErrorComponent />} />
+                </Route>
               </Route>
             </Routes>
             <UnsavedChangesNotifier />

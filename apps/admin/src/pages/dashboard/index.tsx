@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { Card, Row, Col, Statistic, Typography, Table, Spin } from "antd"
-import { ArrowUpOutlined, ShoppingCartOutlined, DollarOutlined, UserOutlined } from "@ant-design/icons"
+import { ArrowUpOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons"
 import axios from "axios"
 
 const { Title } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
+const API_URL = import.meta.env.VITE_API_URL || "/api"
 
 interface DashboardStats {
   totalProducts: number
@@ -26,12 +26,14 @@ export const DashboardPage = () => {
           axios.get(`${API_URL}/revenue/stats`),
         ])
 
+        const overview = revenueRes.data?.overview || {}
+
         setStats({
           totalProducts: productsRes.data.pagination?.total || 0,
-          totalClicks: revenueRes.data.totalClicks || 0,
-          pendingRevenue: revenueRes.data.pendingRevenue || 0,
-          confirmedRevenue: revenueRes.data.confirmedRevenue || 0,
-          recentTransactions: revenueRes.data.recentTransactions || [],
+          totalClicks: overview.totalClicks || 0,
+          pendingRevenue: 0,
+          confirmedRevenue: overview.totalRevenue || 0,
+          recentTransactions: [],
         })
       } catch (error) {
         console.error("Failed to fetch dashboard stats:", error)

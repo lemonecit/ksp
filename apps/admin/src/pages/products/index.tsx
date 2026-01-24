@@ -4,7 +4,7 @@ import { SearchOutlined, ReloadOutlined, LinkOutlined, CopyOutlined } from "@ant
 import axios from "axios"
 
 const { Title, Text } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
+const API_URL = import.meta.env.VITE_API_URL || "/api"
 const API_BASE = API_URL.replace('/api', '')
 const KSP_AFFILIATE_ID = "14887"
 
