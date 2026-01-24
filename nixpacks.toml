@@ -1,0 +1,11 @@
+[phases.setup]
+# Keep default Node/NPM selection from Nixpacks
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build:railway"]
+
+[start]
+cmd = "npm run start:railway"
