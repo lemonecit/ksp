@@ -31,5 +31,5 @@ RUN npm install && npm run build
 WORKDIR /app/apps/api
 EXPOSE 3001
 
-# Start the API
-CMD ["node", "dist/index.js"]
+# Start script that runs migrations then starts server
+CMD cd /app/packages/database && npx prisma migrate deploy && cd /app/apps/api && node dist/index.js
