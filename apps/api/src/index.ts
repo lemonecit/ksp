@@ -46,7 +46,7 @@ app.setNotFoundHandler((request, reply) => {
   if (url.startsWith('/api') || url.startsWith('/go') || url.startsWith('/health')) {
     return reply.status(404).send({ error: 'Not found' })
   }
-  return reply.sendFile('index.html')
+  return reply.sendFile('index.html', adminDistPath)
 })
 
 // Start server
