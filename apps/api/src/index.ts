@@ -19,10 +19,12 @@ app.register(cors, { origin: true })
 app.register(multipart)
 
 // Serve admin panel
-const adminDistPath = path.join(__dirname, '../../admin/dist')
+const adminDistPath = path.resolve(__dirname, '../../admin/dist')
+console.log('Admin dist path:', adminDistPath)
 app.register(fastifyStatic, {
   root: adminDistPath,
-  prefix: '/'
+  prefix: '/',
+  decorateReply: false
 })
 
 // Routes
