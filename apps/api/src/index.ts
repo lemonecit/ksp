@@ -1,6 +1,8 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import multipart from '@fastify/multipart'
+import fastifyStatic from '@fastify/static'
+import path from 'path'
 import { redirectRoute } from './routes/redirect'
 import { productsRoute } from './routes/products'
 import { revenueRoute } from './routes/revenue'
@@ -16,6 +18,13 @@ const app = Fastify({ logger: true })
 app.register(cors, { origin: true })
 app.register(multipart)
 
+// Serve admin panel
+const adminDistPath = path.join(__dirname, '../../admin/dist')
+app.register(fastifyStatic, {
+  root: adminDistPath,
+  prefix: '/'
+})
+
 // Routes
 app.register(authRoutes, { prefix: '/api/auth' })
 app.register(redirectRoute, { prefix: '/go' })
@@ -28,6 +37,15 @@ app.register(telegramRoutes, { prefix: '/api/telegram' })
 
 // Health check
 app.get('/health', async () => ({ status: 'ok' }))
+
+// Fallback to index.html for SPA
+app.setNotFoundHandler((request, reply) => {
+  const url = request.raw.url || ''
+  if (url.startsWith('/api') || url.startsWith('/go') || url.startsWith('/health')) {
+    return reply.status(404).send({ error: 'Not found' })
+  }
+  return reply.sendFile('index.html')
+})
 
 // Start server
 const start = async () => {
