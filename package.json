@@ -11,7 +11,6 @@
     "scrape": "cd apps/scraper && npm run scrape",
     "translate": "cd apps/scraper && npm run translate",
     "db:migrate": "cd packages/database && npx prisma migrate dev",
-    "db:migrate:deploy": "cd packages/database && npx prisma migrate deploy",
     "db:generate": "cd packages/database && npx prisma generate",
     "db:studio": "cd packages/database && npx prisma studio",
     "install:all": "npm install && cd packages/database && npm install && cd ../../apps/api && npm install && cd ../web && npm install && cd ../admin && npm install && cd ../scraper && npm install",
