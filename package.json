@@ -1,6 +1,6 @@
 {
   "name": "ksp-affiliate-system",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "KSP Affiliate Revenue System with bilingual support",
   "private": true,
   "packageManager": "npm@10.2.0",
