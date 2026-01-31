@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 import multipart from '@fastify/multipart'
 import fastifyStatic from '@fastify/static'
 import path from 'path'
+import fs from 'fs'
 import { redirectRoute } from './routes/redirect'
 import { productsRoute } from './routes/products'
 import { revenueRoute } from './routes/revenue'
@@ -23,8 +24,7 @@ const adminDistPath = path.resolve(__dirname, '../../admin/dist')
 console.log('Admin dist path:', adminDistPath)
 app.register(fastifyStatic, {
   root: adminDistPath,
-  prefix: '/',
-  decorateReply: false
+  prefix: '/'
 })
 
 // Routes
@@ -46,7 +46,9 @@ app.setNotFoundHandler((request, reply) => {
   if (url.startsWith('/api') || url.startsWith('/go') || url.startsWith('/health')) {
     return reply.status(404).send({ error: 'Not found' })
   }
-  return reply.sendFile('index.html', adminDistPath)
+  const indexPath = path.join(adminDistPath, 'index.html')
+  const indexContent = fs.readFileSync(indexPath, 'utf-8')
+  return reply.type('text/html').send(indexContent)
 })
 
 // Start server
