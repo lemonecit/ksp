@@ -5,7 +5,11 @@
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npm run build:railway"]
+cmds = [
+  "cd packages/database && npm install && npx prisma generate && npm run build",
+  "cd ../../apps/admin && npm install && npm run build",
+  "cd ../api && npm install && npm run build"
+]
 
 [start]
 cmd = "npm run start:railway"
