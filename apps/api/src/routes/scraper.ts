@@ -19,9 +19,20 @@ export const scraperRoutes: FastifyPluginAsync = async (app) => {
     try {
       app.log.info('Starting scraper...')
       
-      // Run the scraper package (shell: true needed for Windows)
+      // Check if we're in production (Railway) - scraper needs Playwright which isn't available
+      const isProduction = process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production'
+      
+      if (isProduction) {
+        return reply.status(400).send({
+          success: false,
+          message: 'Scraper cannot run on Railway - it requires Playwright browser. Run locally or use Raspberry Pi cron job.',
+          hint: 'Run "npm run scrape" locally or set up the Raspberry Pi scraper'
+        })
+      }
+      
+      // Run the scraper package (local development only)
       const { stdout, stderr } = await execAsync('npm run scrape', {
-        cwd: 'F:/ksp',
+        cwd: process.cwd().replace('/apps/api', ''),
         timeout: 300000, // 5 min timeout
         shell: true
       })
