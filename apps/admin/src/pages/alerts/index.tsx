@@ -4,7 +4,7 @@ import { DeleteOutlined, ReloadOutlined, BellOutlined, SendOutlined } from "@ant
 import axios from "axios"
 
 const { Title } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "/api"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
 
 export const AlertList = () => {
   const [alerts, setAlerts] = useState<any[]>([])

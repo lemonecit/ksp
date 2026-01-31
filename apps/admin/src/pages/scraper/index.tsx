@@ -4,7 +4,7 @@ import { PlayCircleOutlined, SyncOutlined, TranslationOutlined } from "@ant-desi
 import axios from "axios"
 
 const { Title, Paragraph } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "/api"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
 
 export const ScraperControl = () => {
   const [scraping, setScraping] = useState(false)

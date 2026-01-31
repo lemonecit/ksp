@@ -4,7 +4,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  // Turso (libsql) for production, SQLite for local
+  // TURSO_DATABASE_URL="libsql://xxx.turso.io"
+  // TURSO_AUTH_TOKEN="xxx"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -175,15 +178,5 @@ model TelegramSettings {
   lastResetAt       DateTime @default(now())
   
   updatedAt         DateTime @updatedAt
-}
-
-model AdminUser {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  name        String?
-  totpEnabled Boolean  @default(false)
-  totpSecret  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 

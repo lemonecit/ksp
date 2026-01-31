@@ -1,7 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { prisma } from '@ksp/database'
 import { Telegraf } from 'telegraf'
-import { generateDirectAffiliateLink } from '@ksp/shared'
 
 /**
  * TELEGRAM API ROUTES
@@ -9,8 +8,11 @@ import { generateDirectAffiliateLink } from '@ksp/shared'
  * Manage Telegram bot posting and settings
  */
 
-const ENV_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || ''
-const ENV_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || ''
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8126807418:AAEPb8GWZkA4QeZL05vq-TAdM9Kub5GGWgY'
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '@KSPmivtzei'
+const KSP_AFFILIATE_ID = '14887'
+
+const bot = new Telegraf(BOT_TOKEN)
 
 // Escape special characters for Telegram MarkdownV2
 function escapeMarkdown(text: string): string {
@@ -19,7 +21,7 @@ function escapeMarkdown(text: string): string {
 
 // Generate affiliate link
 function generateAffiliateLink(sku: string): string {
-  return generateDirectAffiliateLink(sku)
+  return `https://ksp.co.il/web/item/${sku}?appkey=${KSP_AFFILIATE_ID}`
 }
 
 export const telegramRoutes: FastifyPluginAsync = async (app) => {
@@ -55,8 +57,8 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       settings = await prisma.telegramSettings.create({
         data: {
           id: 'default',
-          botToken: ENV_BOT_TOKEN,
-          channelId: ENV_CHANNEL_ID,
+          botToken: BOT_TOKEN,
+          channelId: CHANNEL_ID,
           minDiscountPercent: 40,
           maxPostsPerDay: 10,
           scheduleTimes: '["10:00", "20:00"]'
@@ -97,8 +99,8 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       where: { id: 'default' },
       create: {
         id: 'default',
-        botToken: ENV_BOT_TOKEN,
-        channelId: channelId || ENV_CHANNEL_ID,
+        botToken: BOT_TOKEN,
+        channelId: channelId || CHANNEL_ID,
         minDiscountPercent: minDiscountPercent || 40,
         maxPostsPerDay: maxPostsPerDay || 10,
         scheduleEnabled: scheduleEnabled ?? true
@@ -159,17 +161,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
     }
     
     try {
-      const botToken = settings?.botToken || ENV_BOT_TOKEN
-      const channelId = settings?.channelId || ENV_CHANNEL_ID
-
-      if (!botToken) {
-        return reply.status(500).send({ error: 'Telegram bot token is not configured' })
-      }
-      if (!channelId) {
-        return reply.status(500).send({ error: 'Telegram channel ID is not configured' })
-      }
-
-      const bot = new Telegraf(botToken)
+      const channelId = settings?.channelId || CHANNEL_ID
       let messageId = ''
       
       if (alert.product.imageUrl) {
@@ -250,12 +242,6 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
     const minDiscount = settings?.minDiscountPercent || 40
     const maxPosts = settings?.maxPostsPerDay || 10
     const postsToday = settings?.postsToday || 0
-    const botToken = settings?.botToken || ENV_BOT_TOKEN
-    const channelId = settings?.channelId || ENV_CHANNEL_ID
-
-    if (!botToken || !channelId) {
-      return { success: false, message: 'Telegram is not configured', posted: 0 }
-    }
     
     if (postsToday >= maxPosts) {
       return { success: false, message: 'Daily limit reached', posted: 0 }
@@ -279,7 +265,6 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
     })
     
     let posted = 0
-    const bot = new Telegraf(botToken)
     
     for (const alert of alerts) {
       try {
@@ -304,7 +289,8 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
             { text: '🛒 לרכישה ב-KSP', url: affiliateLink }
           ]]
         }
-
+        
+        const channelId = settings?.channelId || CHANNEL_ID
         let messageId = ''
         
         if (alert.product.imageUrl) {

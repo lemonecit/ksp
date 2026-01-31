@@ -5,7 +5,7 @@ import axios from "axios"
 import dayjs from "dayjs"
 
 const { Title, Text } = Typography
-const API_URL = import.meta.env.VITE_API_URL || "/api"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
 
 export const TelegramPage = () => {
   const [posts, setPosts] = useState<any[]>([])

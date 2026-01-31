@@ -5,22 +5,15 @@
 
 import { Telegraf } from 'telegraf'
 import { PrismaClient } from '../../../packages/database/node_modules/@prisma/client'
-import { generateDirectAffiliateLink } from '@ksp/shared'
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || ''
-const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || ''
-
-if (!BOT_TOKEN) {
-  throw new Error('Missing TELEGRAM_BOT_TOKEN')
-}
-if (!CHANNEL_ID) {
-  throw new Error('Missing TELEGRAM_CHANNEL_ID')
-}
+const BOT_TOKEN = '8126807418:AAEPb8GWZkA4QeZL05vq-TAdM9Kub5GGWgY'
+const CHANNEL_ID = '@KSPmivtzei'
 
 const bot = new Telegraf(BOT_TOKEN)
 const prisma = new PrismaClient()
 
-const generateAffiliateLink = (sku: string) => generateDirectAffiliateLink(sku)
+const generateAffiliateLink = (sku: string) => 
+  `https://ksp.co.il/web/item/${sku}?appkey=14887`
 
 async function postTopDeals() {
   console.log('📢 Posting top deals to Telegram...\n')
