@@ -19,10 +19,11 @@ export const scraperRoutes: FastifyPluginAsync = async (app) => {
     try {
       app.log.info('Starting scraper...')
       
-      // Run the scraper package
+      // Run the scraper package (shell: true needed for Windows)
       const { stdout, stderr } = await execAsync('npm run scrape', {
         cwd: 'F:/ksp',
-        timeout: 300000 // 5 min timeout
+        timeout: 300000, // 5 min timeout
+        shell: true
       })
       
       app.log.info(stdout)
