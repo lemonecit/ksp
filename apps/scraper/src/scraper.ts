@@ -1,5 +1,6 @@
 import { chromium, Page } from 'playwright'
 import { prisma } from '@ksp/database'
+import { Telegraf } from 'telegraf'
 
 /**
  * KSP SCRAPER (Worker A)
@@ -7,9 +8,73 @@ import { prisma } from '@ksp/database'
  * This worker scrapes product data from ksp.co.il
  * It extracts: price, stock status, images, Hebrew title
  * and saves to the products table.
+ * 
+ * Automatically posts significant price drops to Telegram!
  */
 
 const KSP_BASE_URL = 'https://ksp.co.il'
+
+// Telegram config
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8126807418:AAEPb8GWZkA4QeZL05vq-TAdM9Kub5GGWgY'
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '@KSPmivtzei'
+const MIN_DISCOUNT_PERCENT = 5 // Minimum discount to post to Telegram
+const KSP_AFFILIATE_ID = '14887'
+
+const bot = new Telegraf(BOT_TOKEN)
+
+// Escape special characters for Telegram MarkdownV2
+function escapeMarkdown(text: string): string {
+  return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&')
+}
+
+// Post price drop to Telegram
+async function postToTelegram(
+  title: string,
+  oldPrice: number,
+  newPrice: number,
+  sku: string,
+  imageUrl?: string,
+  percentOff?: number
+) {
+  const savings = oldPrice - newPrice
+  const discount = percentOff || Math.round((savings / oldPrice) * 100)
+  const affiliateLink = `https://ksp.co.il/web/item/${sku}?appkey=${KSP_AFFILIATE_ID}`
+
+  const message = `🔥 *ירידת מחיר\\!* 🔥
+
+📦 ${escapeMarkdown(title)}
+
+~~₪${oldPrice}~~ → *₪${newPrice}*
+💥 חיסכון של ${discount}% \\(₪${Math.round(savings)}\\)\\!
+
+⏰ *מלאי מוגבל\\!*`
+
+  const keyboard = {
+    inline_keyboard: [[
+      { text: '🛒 לרכישה ב-KSP', url: affiliateLink }
+    ]]
+  }
+
+  try {
+    if (imageUrl) {
+      await bot.telegram.sendPhoto(CHANNEL_ID, imageUrl, {
+        caption: message,
+        parse_mode: 'MarkdownV2',
+        reply_markup: keyboard
+      })
+    } else {
+      await bot.telegram.sendMessage(CHANNEL_ID, message, {
+        parse_mode: 'MarkdownV2',
+        reply_markup: keyboard
+      })
+    }
+    console.log(`   📢 POSTED TO TELEGRAM: ${title.substring(0, 40)}...`)
+    return true
+  } catch (error: any) {
+    console.error(`   ❌ Telegram error: ${error.message}`)
+    return false
+  }
+}
 
 // Categories to scrape - KSP uses "world" for main sections
 const CATEGORIES = [
@@ -171,6 +236,18 @@ async function saveProduct(product: ScrapedProduct) {
         
         const emoji = percentChange < 0 ? '🔥 PRICE DROP' : '📈 Price Up'
         console.log(`   ${emoji}: ${product.sku} ${lastPrice}₪ → ${product.price}₪ (${percentChange > 0 ? '+' : ''}${percentChange.toFixed(1)}%)`)
+        
+        // Auto-post significant price drops to Telegram
+        if (percentChange < 0 && Math.abs(percentChange) >= MIN_DISCOUNT_PERCENT) {
+          await postToTelegram(
+            product.title,
+            lastPrice,
+            product.price,
+            product.sku,
+            product.imageUrl,
+            Math.abs(Math.round(percentChange))
+          )
+        }
       }
     }
     
