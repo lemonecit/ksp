@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma, Platform, Language } from '@ksp/database'
+import { prisma } from '@ksp/database'
 
 const KSP_AFFILIATE_ID = process.env.KSP_AFFILIATE_ID || 'YOUR_ID'
 
@@ -38,8 +38,8 @@ export const redirectRoute: FastifyPluginAsync = async (app) => {
     const tracking = await prisma.revenueTracking.create({
       data: {
         productId,
-        platform: channel as Platform,
-        language: lang as Language,
+        platform: channel,
+        language: lang,
         status: 'pending'
       }
     })

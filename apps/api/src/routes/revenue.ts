@@ -41,7 +41,7 @@ export const revenueRoute: FastifyPluginAsync = async (app) => {
       })
     ])
     
-    const revenue = totalRevenue._sum.commission?.toNumber() || 0
+    const revenue = totalRevenue._sum.commission || 0
     
     // Calculate EPC (Earnings Per Click)
     const epc = totalClicks > 0 ? revenue / totalClicks : 0
@@ -59,12 +59,12 @@ export const revenueRoute: FastifyPluginAsync = async (app) => {
       byPlatform: platformStats.map(p => ({
         platform: p.platform,
         clicks: p._count.id,
-        revenue: p._sum.commission?.toNumber() || 0
+        revenue: p._sum.commission || 0
       })),
       byLanguage: languageStats.map(l => ({
         language: l.language,
         clicks: l._count.id,
-        revenue: l._sum.commission?.toNumber() || 0
+        revenue: l._sum.commission || 0
       }))
     }
   })
@@ -117,7 +117,7 @@ export const revenueRoute: FastifyPluginAsync = async (app) => {
         current.clicks++
         if (click.status === 'confirmed') {
           current.sales++
-          current.revenue += click.commission?.toNumber() || 0
+          current.revenue += click.commission || 0
         }
       }
       
