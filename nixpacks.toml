@@ -1,8 +1,8 @@
 [phases.setup]
-# Keep default Node/NPM selection from Nixpacks
+nixPkgs = ["nodejs_20", "npm-9_x"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm ci --production=false"]
 
 [phases.build]
 cmds = [
@@ -12,4 +12,4 @@ cmds = [
 ]
 
 [start]
-cmd = "npm run start:railway"
+cmd = "cd apps/api && node dist/index.js"
