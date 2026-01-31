@@ -22,6 +22,7 @@ WORKDIR /app/packages/database
 RUN npm install && npx prisma generate && npm run build
 
 WORKDIR /app/apps/admin
+ENV VITE_API_URL=/api
 RUN npm install && npm run build
 
 WORKDIR /app/apps/api
